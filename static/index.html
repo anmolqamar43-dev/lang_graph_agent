@@ -1,0 +1,498 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RefundFlow AI | Customer Support</title>
+  <style>
+    :root {
+      --navy: #14213d;
+      --blue: #315efb;
+      --bg: #f4f7fc;
+      --text: #172033;
+      --muted: #68758a;
+      --border: #e4e9f2;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      background: var(--navy);
+      color: white;
+      padding: 20px 6%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand { font-size: 21px; font-weight: 800; }
+    .brand span { color: #8daaff; }
+    .tagline { color: #c4cee0; font-size: 13px; margin-top: 5px; }
+
+    .health {
+      font-size: 12px;
+      background: #253654;
+      border-radius: 30px;
+      padding: 9px 12px;
+      white-space: nowrap;
+    }
+
+    .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #fbbf24;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+
+    main {
+      max-width: 1050px;
+      margin: 36px auto;
+      padding: 0 20px;
+    }
+
+    .intro { margin-bottom: 25px; }
+    .intro h1 { margin: 0 0 8px; font-size: 30px; }
+    .intro p, .muted { color: var(--muted); line-height: 1.6; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.8fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      padding: 25px;
+      box-shadow: 0 8px 30px rgba(22, 42, 80, 0.04);
+      min-width: 0;
+    }
+
+    h2 { font-size: 19px; margin: 0 0 8px; }
+    .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+
+    label {
+      display: block;
+      font-weight: 650;
+      font-size: 13px;
+      margin: 18px 0 8px;
+    }
+
+    input, textarea {
+      width: 100%;
+      border: 1px solid #d8dfeb;
+      border-radius: 10px;
+      padding: 12px 13px;
+      font: inherit;
+      font-size: 14px;
+      background: white;
+      color: var(--text);
+      outline: none;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px #315efb18;
+    }
+
+    textarea { min-height: 135px; resize: vertical; line-height: 1.6; }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity .2s;
+    }
+
+    button:disabled { opacity: .55; cursor: wait; }
+    .primary { background: var(--blue); color: white; width: 100%; margin-top: 20px; }
+    .secondary { background: #edf1ff; color: #244bd1; }
+    .approve { background: #168454; color: white; flex: 1; }
+    .reject { background: #fff0ef; color: #b42318; flex: 1; }
+
+    .side-icon {
+      width: 43px;
+      height: 43px;
+      display: grid;
+      place-items: center;
+      background: #edf1ff;
+      color: var(--blue);
+      border-radius: 12px;
+      font-size: 21px;
+      margin-bottom: 16px;
+    }
+
+    .step {
+      display: flex;
+      gap: 12px;
+      margin-top: 22px;
+      align-items: flex-start;
+    }
+
+    .number {
+      min-width: 29px;
+      height: 29px;
+      border-radius: 9px;
+      display: grid;
+      place-items: center;
+      background: #edf1ff;
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .step strong { font-size: 13px; }
+    .step p { color: var(--muted); font-size: 12px; line-height: 1.6; margin: 5px 0 0; }
+
+    .result {
+      display: none;
+      margin-top: 22px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      overflow-wrap: anywhere;
+    }
+
+    .result h3 { margin: 0 0 12px; font-size: 16px; }
+    .status {
+      display: inline-block;
+      border-radius: 30px;
+      padding: 5px 9px;
+      background: #edf1ff;
+      color: #244bd1;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .result-text { white-space: pre-wrap; line-height: 1.7; font-size: 14px; }
+    .review-actions { display: flex; gap: 10px; margin-top: 15px; }
+    .notice { font-size: 12px; color: var(--muted); line-height: 1.6; }
+    .error { color: #b42318; }
+    .success { color: #168454; }
+    .thread { font-size: 11px; color: var(--muted); word-break: break-all; margin-top: 12px; }
+
+    footer { text-align: center; padding: 24px; color: var(--muted); font-size: 12px; }
+
+    @media (max-width: 720px) {
+      header { padding: 18px 20px; align-items: flex-start; }
+      .tagline { max-width: 230px; line-height: 1.5; }
+      main { margin: 25px auto; padding: 0 14px; }
+      .layout { grid-template-columns: 1fr; }
+      .intro h1 { font-size: 25px; }
+      .card { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <div class="brand">RefundFlow <span>AI</span></div>
+      <div class="tagline">Intelligent customer support, powered by LangGraph</div>
+    </div>
+    <div class="health" id="health">
+      <span class="dot"></span>Checking API...
+    </div>
+  </header>
+
+  <main>
+    <section class="intro">
+      <h1>How can we help you?</h1>
+      <p>Submit a support request and our AI agent will help with your order.</p>
+    </section>
+
+    <div class="layout">
+      <section class="card">
+        <h2>Submit a request</h2>
+        <div class="subtitle">Describe your issue clearly for the best assistance.</div>
+
+        <form id="supportForm">
+          <label for="threadId">Request ID</label>
+          <input id="threadId" placeholder="Automatically generated" readonly>
+
+          <label for="message">How can we help? *</label>
+          <textarea id="message" required minlength="3"
+            placeholder="Example: I want a refund for order ORD-1001 because the item arrived damaged."></textarea>
+
+          <p class="notice">
+            Tip: Include your order ID (for example, ORD-1001) for
+            refund, tracking, cancellation, or complaint requests.
+          </p>
+
+          <button class="primary" id="submitBtn" type="submit">
+            Submit support request →
+          </button>
+        </form>
+
+        <div class="result" id="result" aria-live="polite">
+          <h3 id="resultTitle">Request result</h3>
+          <div id="resultStatus"></div>
+          <p class="result-text" id="resultText"></p>
+          <div id="reviewActions"></div>
+          <div class="thread" id="resultThread"></div>
+        </div>
+      </section>
+
+      <aside class="card">
+        <div class="side-icon">✦</div>
+        <h2>Your AI support assistant</h2>
+        <p class="muted" style="font-size:13px">
+          Your request is checked against the demo order and refund rules.
+        </p>
+
+        <div class="step">
+          <div class="number">1</div>
+          <div>
+            <strong>Submit your issue</strong>
+            <p>Explain your problem and include your order ID when relevant.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="number">2</div>
+          <div>
+            <strong>AI checks your request</strong>
+            <p>The agent classifies your message and checks order information.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="number">3</div>
+          <div>
+            <strong>Review when required</strong>
+            <p>Refunds above $100 require a human decision under this demo policy.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="number">4</div>
+          <div>
+            <strong>Get your response</strong>
+            <p>See the agent's final response and decision below your request.</p>
+          </div>
+        </div>
+
+        <hr style="border:0;border-top:1px solid var(--border);margin:24px 0">
+        <p class="notice">
+          Demo environment: use only the sample orders configured for your project.
+          Refund processing depends on your backend implementation.
+        </p>
+      </aside>
+    </div>
+  </main>
+
+  <footer>RefundFlow AI · LangGraph Refund Agent</footer>
+
+  <script>
+    const form = document.getElementById("supportForm");
+    const messageInput = document.getElementById("message");
+    const threadInput = document.getElementById("threadId");
+    const submitBtn = document.getElementById("submitBtn");
+    const resultBox = document.getElementById("result");
+    const resultTitle = document.getElementById("resultTitle");
+    const resultStatus = document.getElementById("resultStatus");
+    const resultText = document.getElementById("resultText");
+    const reviewActions = document.getElementById("reviewActions");
+    const resultThread = document.getElementById("resultThread");
+    const health = document.getElementById("health");
+
+    let activeThreadId = null;
+
+    function newThreadId() {
+      return crypto.randomUUID();
+    }
+
+    function showResult(title, status, text, threadId, isError = false) {
+      resultBox.style.display = "block";
+      resultTitle.textContent = title;
+      resultStatus.replaceChildren();
+
+      const badge = document.createElement("span");
+      badge.className = "status";
+      badge.textContent = status.replaceAll("_", " ");
+      resultStatus.appendChild(badge);
+
+      resultText.textContent = text || "No response was returned.";
+      resultText.className = "result-text" + (isError ? " error" : "");
+      resultThread.textContent = threadId ? "Request ID: " + threadId : "";
+      reviewActions.replaceChildren();
+    }
+
+    async function apiRequest(url, options = {}) {
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          "Content-Type": "application/json",
+          ...(options.headers || {})
+        }
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.detail || "Request failed with status " + response.status);
+      }
+      return data;
+    }
+
+    function renderReview(interrupts, threadId) {
+      const details = interrupts[0] || {};
+      const lines = [
+        "This request needs a human decision.",
+        details.order_id ? "Order: " + details.order_id : "",
+        details.amount != null ? "Refund amount: $" + Number(details.amount).toFixed(2) : "",
+        details.message ? "Customer message: " + details.message : "",
+        details.question || "Approve this refund?"
+      ].filter(Boolean);
+
+      resultText.textContent = lines.join("\n");
+
+      const actions = document.createElement("div");
+      actions.className = "review-actions";
+
+      const approve = document.createElement("button");
+      approve.className = "approve";
+      approve.textContent = "Approve";
+
+      const reject = document.createElement("button");
+      reject.className = "reject";
+      reject.textContent = "Reject";
+
+      approve.addEventListener("click", () => submitReview(threadId, true, actions));
+      reject.addEventListener("click", () => submitReview(threadId, false, actions));
+
+      actions.append(approve, reject);
+      reviewActions.replaceChildren(actions);
+    }
+
+    async function submitReview(threadId, approved, actions) {
+      const buttons = actions.querySelectorAll("button");
+      buttons.forEach(button => button.disabled = true);
+      resultText.textContent = "Submitting your review decision...";
+
+      try {
+        const data = await apiRequest(
+          "/review/" + encodeURIComponent(threadId),
+          {
+            method: "POST",
+            body: JSON.stringify({ approved })
+          }
+        );
+
+        renderResponse(data);
+      } catch (error) {
+        resultText.textContent = error.message;
+        resultText.className = "result-text error";
+        buttons.forEach(button => button.disabled = false);
+      }
+    }
+
+    function renderResponse(data) {
+      const threadId = data.thread_id || activeThreadId;
+      const status = data.status || "completed";
+
+      showResult(
+        status === "awaiting_approval" ? "Human review required" : "Request processed",
+        status,
+        data.response || data.decision || "Your request has been processed.",
+        threadId
+      );
+
+      if (status === "awaiting_approval") {
+        renderReview(data.interrupts || [], threadId);
+      } else if (data.response) {
+        resultText.textContent = data.response;
+        if (data.decision) {
+          resultText.textContent += "\n\nDecision: " + data.decision;
+        }
+      }
+    }
+
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+
+      const message = messageInput.value.trim();
+      if (message.length < 3) {
+        showResult("Check your message", "invalid", "Please enter more detail.", "");
+        return;
+      }
+
+      activeThreadId = newThreadId();
+      threadInput.value = activeThreadId;
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Processing request...";
+      reviewActions.replaceChildren();
+
+      showResult(
+        "Processing your request",
+        "processing",
+        "The AI agent is checking your request. Please wait...",
+        activeThreadId
+      );
+
+      try {
+        const data = await apiRequest("/support", {
+          method: "POST",
+          body: JSON.stringify({
+            message,
+            thread_id: activeThreadId
+          })
+        });
+
+        renderResponse(data);
+      } catch (error) {
+        showResult(
+          "Could not process request",
+          "error",
+          error.message,
+          activeThreadId,
+          true
+        );
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit support request →";
+      }
+    });
+
+    async function checkHealth() {
+      try {
+        const data = await apiRequest("/health");
+        health.replaceChildren();
+
+        const dot = document.createElement("span");
+        dot.className = "dot";
+        dot.style.background = "#4ade80";
+        health.append(dot, document.createTextNode(
+          data.status === "ok" ? "API Connected" : "API Responding"
+        ));
+      } catch {
+        health.replaceChildren();
+
+        const dot = document.createElement("span");
+        dot.className = "dot";
+        dot.style.background = "#f87171";
+        health.append(dot, document.createTextNode("API Offline"));
+      }
+    }
+
+    threadInput.value = newThreadId();
+    checkHealth();
+  </script>
+</body>
+</html>
